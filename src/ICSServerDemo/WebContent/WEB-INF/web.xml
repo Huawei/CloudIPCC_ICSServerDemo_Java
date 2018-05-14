@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:web="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+  <display-name>UserAppDemo</display-name>
+  <listener>
+  		<listener-class>com.huawei.userdemo.servlet.InitServletListener</listener-class>
+  </listener>
+  <listener>
+    	<listener-class>com.huawei.demo.filter.SessionListener</listener-class>      
+  </listener>
+  <session-config>
+  	<session-timeout>1</session-timeout>
+  </session-config>
+ 
+  <servlet>
+    <servlet-name>EventHandle</servlet-name>
+    <servlet-class>com.huawei.userdemo.servlet.EventHandleServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>EventHandle</servlet-name>
+    <url-pattern>/event.do</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>MultiMediaConf</servlet-name>
+    <servlet-class>com.huawei.userdemo.servlet.MultiMediaConfServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MultiMediaConf</servlet-name>
+    <url-pattern>/multimedia.do</url-pattern>
+  </servlet-mapping>
+   
+  <servlet>
+    <servlet-name>ParamterConf</servlet-name>
+    <servlet-class>com.huawei.userdemo.servlet.ParamterConfServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ParamterConf</servlet-name>
+    <url-pattern>/paramterconf.do</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>QuasiRealTimeCall</servlet-name>
+    <servlet-class>com.huawei.userdemo.servlet.QuasiRealTimeCallServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>QuasiRealTimeCall</servlet-name>
+    <url-pattern>/quasirealtimecall.do</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>QueryQueueDevice</servlet-name>
+    <servlet-class>com.huawei.userdemo.servlet.QueryQueueDeviceServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>QueryQueueDevice</servlet-name>
+    <url-pattern>/queryqueuedevice.do</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>ServerConnect</servlet-name>
+    <servlet-class>com.huawei.userdemo.servlet.ServerConnectServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ServerConnect</servlet-name>
+    <url-pattern>/serverconnect.do</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>UserOnline</servlet-name>
+    <servlet-class>com.huawei.userdemo.servlet.UserOnlineServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UserOnline</servlet-name>
+    <url-pattern>/useronline.do</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>VerifiyCode</servlet-name>
+    <servlet-class>com.huawei.userdemo.servlet.VerifiyCodeServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>VerifiyCode</servlet-name>
+    <url-pattern>/verifiycode.do</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+	<servlet-name>UserEventServlet</servlet-name>
+	<servlet-class>com.huawei.userdemo.servlet.UserEventServlet</servlet-class>
+	<load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+	<servlet-name>UserEventServlet</servlet-name>
+	<url-pattern>/UserEventServlet</url-pattern>
+  </servlet-mapping>
+     
+  <filter>
+    <filter-name>auth</filter-name>
+    <filter-class>com.huawei.demo.filter.RequestFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>auth</filter-name>
+    <url-pattern>*.do</url-pattern>
+  </filter-mapping>
+  <welcome-file-list>
+    <welcome-file>UserApp.html</welcome-file>
+  </welcome-file-list>
+</web-app>

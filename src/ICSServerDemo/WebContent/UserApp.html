@@ -1,0 +1,450 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!--<meta http-equiv ="X-UA-Compatible" content ="IE=8" /> -->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+	<script type="text/javascript" src="page/openjs/jquery-1.6.2.js"></script>
+	<script type="text/javascript" src="page/openjs/json.js"></script>
+	<script type="text/javascript" src="page/js/dataInfo/hashMap.js"></script>
+	<script type="text/javascript" src="page/js/dataInfo/globalVariable.js"></script>
+	<script type="text/javascript" src="page/js/eventHandle/eventHandle.js"></script>
+	<script type="text/javascript" src="page/js/eventHandle/eventProcess.js"></script>
+	<script type="text/javascript" src="page/js/operation/init.js"></script>
+	<script type="text/javascript" src="page/js/operation/callcontrol.js"></script>
+	<script type="text/javascript" src="page/js/operation/conf.js"></script>
+	<script type="text/javascript" src="page/js/operation/voice.js"></script>
+	<script type="text/javascript" src="page/js/util.js"></script>
+	<script type="text/javascript" src="page/js/i18n/i18n.js"></script>
+	<script type="text/javascript" src="page/js/i18n/demo.userapp.lang.string.js"></script>
+	
+	<script language="javascript">  
+        window.onload=function()
+        { 
+        	var LanguagePage = new LanguagePageClass();
+        	var I18N = new I18NClass();
+        	var langobj = LanguagePage.GetLanguagePage(global_language);
+            I18N.SwitchI18N(langobj);
+        }  
+    </script>
+	
+	
+	
+	<!--1. Voice Ocx Events --------------------------------------------------------------------------------------------------->
+	<script type="text/javascript" event="VoiceInitResultEvent(sResult)" for="VoiceOcx">		
+		var result = JSON.parse(sResult);
+	    if("0" != result.resultCode)
+	    {
+	        writeLog("VoiceInitResultEvent"+sResult);
+	    }
+	    else
+		{
+	    	init_voice();
+		}
+	</script>
+	
+	<script language="javascript" event="VoiceRegisterResultEvent(sResult)" for="CVoice">
+		var result = JSON.parse(sResult);
+	    if("0" != result.resultCode)
+	    {
+	        writeLog("VoiceRegisterResultEvent"+sResult);
+	    }
+	</script>
+	<script language="javascript" event="VoiceDeregisterResultEvent(sResult)" for="CVoice">
+		var result = JSON.parse(sResult);
+	    if("0" != result.resultCode)
+	    {
+	        writeLog("VoiceDeregisterResultEvent"+sResult);
+	    }
+	</script>
+	<script language="javascript" event="VoiceTalkOutgoingEvent(sResult)" for="CVoice">
+				
+	</script>
+	<script language="javascript" event="VoiceTalkRingBackEvent(sResult)" for="CVoice">
+		var result = JSON.parse(sResult);	   
+	    global_phoneCallId = (result.callid);
+	</script>
+	<script language="javascript" event="VoiceTalkAlertingEvent(sResult)" for="CVoice">
+				
+	</script>
+	<script language="javascript" event="VoiceSrtpResultEvent(sResult)" for="CVoice">
+			
+	</script>
+	<script language="javascript" event="VoiceTalkConnectedEvent(sResult)" for="CVoice">
+		
+	</script>
+	<script language="javascript" event="VoiceTalkReleaseEvent(sResult)" for="CVoice">
+		var result = JSON.parse(sResult);
+	    if("0" != result.resultCode)
+	    {
+	    	writeLog("VoiceTalkReleaseEvent" + sResult);
+	    }
+	    else if("0" == result.resultCode)
+		{
+	    	global_phoneCallId = "";
+		}
+	</script>
+	<script language="javascript" event="VoiceSipInfoArrivedEvent(sResult)" for="CVoice">
+		
+	</script>
+	<script language="javascript" event="VoiceStartCallResultEvent(sResult)" for="CVoice">
+		var result = JSON.parse(sResult);
+	    if("0" != result.resultCode)
+	    {
+	    	writeLog("VoiceStartCallResultEvent" + sResult);
+	    }
+	</script>
+	
+	<!--2. Conference Ocx Events --------------------------------------------------------------------------------------------------->
+	
+	<script type="text/javascript" event="ConfInitResultEvent(eventInfo)" for="ConferenceOcx">
+	    var result = JSON.parse(eventInfo);
+        if("0" != result.resultCode)
+        {
+            writeLog("ConfInitResultEvent"+eventInfo);
+        }
+        else
+	    {
+    	    init_conf();
+	    }
+	</script>
+	<script type="text/javascript" event="JoinConfResultEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("JoinConfResultEvent"+eventInfo);
+		var result = JSON.parse(eventInfo);
+		if("0" ==result.resultCode){
+		    JoinConfResult(result.confId,result.resultCode);
+		}
+	</script>
+	<script type="text/javascript" event="MemberEnterConfEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("MemberEnterConfEvent"+eventInfo);
+		var result = JSON.parse(eventInfo);
+		if (eventInfo.isSelf) {
+		    global_userId = result.userId;
+		} else {
+			
+		}
+		addToMemberList(result.userId);
+	</script>
+	<script type="text/javascript" event="MemberLeaveConfEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("MemberLeaveConfEvent"+eventInfo);
+		var result = JSON.parse(eventInfo);
+		if (result.isSelf) {
+			clearMemberList();
+			clearConfResource();
+		} else {
+		    removeFromMemberList(result.userId);
+		}
+	</script>
+	<script type="text/javascript" event="TerminateConfResultEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("TerminateConfResultEvent"+eventInfo);
+		var result = JSON.parse(eventInfo);
+		if("0"==result.resultCode)
+		{
+			meetingAgentId="";
+			stopMeeting(global_userName,global_confId);
+			clearMemberList();
+			clearConfResource();
+		}
+	</script>
+	<script type="text/javascript" event="VideoSwitchEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("VideoSwitchEvent"+eventInfo);
+	</script>
+	<script type="text/javascript" event="MessageArrivedEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("MessageArrivedEvent"+eventInfo);
+	</script>
+	<script type="text/javascript" event="FileTranProgressEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("FileTranProgressEvent"+eventInfo);
+	</script>
+	<script type="text/javascript" event="FileTranOverEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("FileTranOverEvent"+eventInfo);
+	</script>
+	<script type="text/javascript" event="FileArrivedEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("FileArrivedEvent"+eventInfo);
+	</script>
+	
+	<script type="text/javascript" event="StartShareScreenResultEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("StartShareScreenResultEvent"+eventInfo);
+	</script>
+	<script type="text/javascript" event="SharingOwnerNotifyEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("SharingOwnerNotifyEvent"+eventInfo);
+		var result = JSON.parse(eventInfo);
+		switch (result.action)
+		{
+		case "add":
+			global_screenShareOwner = result.userId;
+			alert(result.userId+" is sharing desktop.");
+			break;
+		case "delete":
+			global_screenShareOwner = "";
+			meetingAgentId = "";
+			alert(result.userId+" stop sharing desktop.");
+			break;
+		}
+	</script>
+	<script type="text/javascript" event="ShareScreenStateNotifyEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("ShareScreenStateNotifyEvent"+eventInfo);
+		var result = JSON.parse(eventInfo);
+		if("Desktop"==result.shareType && "Start"==result.state && global_screenShareOwner != global_userId)
+		{
+			showDesktopShareScreen();
+		}
+		if("Application"==result.shareType && "Start"==result.state && global_screenShareOwner != global_userId)
+		{
+			showDesktopShareScreen();
+		}
+	    if("Application"==result.shareType && "Start"==result.state && global_screenShareOwner == global_userId)
+		{
+		    var ApplicationList = ConferenceOcx.GetApplicationList();
+		    var applicationList = JSON.parse(ApplicationList); 
+		    var appInfoList = applicationList.appInfoList;
+		    $("#application").empty();
+		    $("#application").append("<span>共享的应用程序：</span>");
+	    	$("#application").append("<select id='aplicationId'></select>");
+	    	 for(var i = 0 ; i < appInfoList.length ; i++ ){
+	    		$("#aplicationId").append("<option value='"+appInfoList[i].hwnd+"'>"+appInfoList[i].title+"</option>");
+	    	} 
+	    	$("#application").bind("change",function(){
+	    	    showApplication($("#aplicationId").val());
+	    	    $("#application").empty();
+	    	})
+		}
+		if("Desktop"==result.shareType && "Stop"==result.state && global_screenShareOwner != global_userId)
+		{
+			closeDesktopShareScreen();
+		}
+		if("Application"==result.shareType && "Stop"==result.state && global_screenShareOwner != global_userId)
+		{
+			closeDesktopShareScreen();
+		}
+	</script>
+	<script type="text/javascript" event="ShareFileOpenEvent(eventInfo)" for="ConferenceOcx">
+	  
+	    writeLog("ShareFileOpenEvent"+eventInfo);
+		var result = JSON.parse(eventInfo);
+		if ("self" == result.owner) {
+		    shareFileId = result.fileId;
+		} else {
+			shareFileId = result.fileId;
+			shareFileName = result.fileName;
+			//showShareFileWnd(shareFileId);
+			showShareFileWnd();
+		}
+	</script>
+	<script type="text/javascript" event="ShareFileCurrentPageEvent(eventInfo)" for="ConferenceOcx">
+	    writeLog("ShareFileCurrentPageEvent"+eventInfo);
+	 
+	    var result = JSON.parse(eventInfo);
+	    var pageCount = result.pageCount;
+	    var currentPageNo = result.currentPageNo;
+	    $("#currentPage").text("当前页数："+(currentPageNo+1));
+	    $("#totalPage").text("总页数："+pageCount);
+	    
+	</script>
+	<script type="text/javascript" event="ShareFileCloseEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("ShareFileCloseEvent"+eventInfo);
+		var result = JSON.parse(eventInfo);
+		if ("0" == result.resultCode) {
+			$("#currentPage").empty();
+			$("#totalPage").empty();
+			closeShareFileWnd();
+		    //closeShareFileWnd(result.fileId)
+		}
+	</script>
+	<script type="text/javascript" event="OperationPrivilegeRequestEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("OperationPrivilegeRequestEvent"+eventInfo);
+		var result = JSON.parse(eventInfo);
+		meetingAgentId = result.userId;
+		alert(result.userId+" request for operation privilege.");
+	</script>
+	<script type="text/javascript" event="OperationPrivilegeStateEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("OperationPrivilegeStateEvent"+eventInfo);
+		var result = JSON.parse(eventInfo);
+	    if ("reject" == result.action) {
+			alert("Reject for operation privilege");
+		}
+	</script>
+	<script type="text/javascript" event="ShareScreenWndSizeEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("ShareScreenWndSizeEvent"+eventInfo);	
+		 var result = JSON.parse(eventInfo);
+		 var x = result.X;
+		 var y = result.Y; 
+		 var width = 800;
+		 var height = Math.ceil(width*y/x);
+		 ConferenceOcx.SetShareScreenDisplaySize(width,height);
+	</script>
+	<script type="text/javascript" event="LoadComponentFailedEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("LoadComponentFailedEvent"+eventInfo);
+	</script>
+	<script type="text/javascript" event="ConfNetWorkDisconnectedEvent()" for="ConferenceOcx">
+		writeLog("ConfNetWorkDisconnectedEvent");
+	</script>
+	<script type="text/javascript" event="ConfNetWorkStatusEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("ConfNetWorkStatusEvent"+eventInfo);
+	</script>
+	<script type="text/javascript" event="ConfRemainingTimeEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("ConfRemainingTimeEvent"+eventInfo);
+	</script>
+	<script type="text/javascript" event="ConfVideoDisconnectedEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("ConfVideoDisconnectedEvent"+eventInfo);
+	</script>
+	<script type="text/javascript" event="ConfVideoNotifyEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("ConfVideoNotifyEvent"+eventInfo);
+	</script>
+	<script type="text/javascript" event="ConfVideoFlowWarningEvent(eventInfo)" for="ConferenceOcx">
+		writeLog("ConfVideoFlowWarningEvent"+eventInfo);
+		//closeShareFileWnd(shareFileId,shareFileName);
+		
+	</script>
+	
+	
+	<style type="text/css">
+		input[type="button"]
+		{
+			height: 25px;
+			width: 110px;
+		}	
+	</style>
+	
+</head>	
+	<OBJECT ID="WndUiOcx" CLASSID="CLSID:C0EC67C2-CF8A-4E55-9AB3-8EF7E1BB1C94" width=0 height=0></OBJECT>
+    <OBJECT ID="ConferenceOcx" CLASSID="CLSID:254C557B-CC4D-4258-98E8-EAC7DE31D0A3" width=0 height=0></OBJECT>
+    <OBJECT ID="VoiceOcx" CLASSID="CLSID:0396287C-FEDD-4E49-866B-1CE1D2084390" width=0 height=0></OBJECT>	
+<body>
+<div style="float:left;width:67%">
+	<h3 self="I18N_USERAPPDEMO_INITIALIZE_INTERFACE">Initialize Interface:</h3>
+	<table width="100%" border="0" cellpadding="0" cellspacing="3">
+		<tr>
+			<td>
+				<span self="I18N_USERAPPDEMO_USER_NAME">UserName:</span>
+				<input type="text" value="testUser" ID="userName"/>
+				
+				<input type="button" value="Login" ID="Login" self="I18N_USERAPPDEMO_LOGIN" />
+
+				<input type="button" value="Logout" ID="Logout" self="I18N_USERAPPDEMO_CALL_LOGOUT"/>	
+				<span self="I18N_USERAPPDEMO_CURRENT_STATE">CurrentStatus:</span><span id="status">Not login</span>					
+			</td>
+		</tr>		
+	</table>
+	
+	<h3 self="I18N_USERAPPDEMO_CALL_RELATED">Call Related:</h3>
+	<table width="100%" border="0" cellpadding="0" cellspacing="3">
+		<tr>
+			<td>
+				<span self="I18N_USERAPPDEMO_VERIFYCODE">Verify Code:</span>
+				<input type="text" value="" id="verifyCode" size="4"/>
+				<input id="getVerifyCode" type="button" value="Get Verify Code" self="I18N_USERAPPDEMO_GETVERIFYCODE"/>
+				<img id="verifyCodeImg" src=""/>
+			</td>
+		</tr>
+			
+		<tr>
+			<td>
+				<span self="I18N_USERAPPDEMO_MEDIATYPE">Media Type:</span>
+				<select id="mediaType" onclick="OnClickMediaType()">
+					<option value="1" self="I18N_USERAPPDEMO_WEBCHAT">1-WebChat</option>
+					<option value="2" self="I18N_USERAPPDEMO_VOICECALL">2-VoiceCall</option>
+					<option value="4" self="I18N_USERAPPDEMO_CALLBACK">4-CallBack</option>
+				</select>
+				<span id="isVideoSpan" style="display:none" self="I18N_USERAPPDEMO_VIDEO_OPTION">Video Ability:</span>
+                <select id="isVideo" style="display:none">
+					<option value="0" self="I18N_USERAPPDEMO_VIDEO_NO">Audio Mode</option>
+					<option value="1" self="I18N_USERAPPDEMO_VIDEO_YES">Audio&Video Mode</option>
+                </select>
+				<span self="I18N_USERAPPDEMO_ACCESSCODE">AccessCode:</span>
+				<input type="text" value="30004" ID="accessCode" size="3"/>
+				<span self="I18N_USERAPPDEMO_CALLDATA">Call Data:</span>
+				<input type="text" value="1004" ID="callData" size="4"/>
+				<span>uvid:</span>
+				<input type="text" value="-1" ID="uvid" size="8"/>
+			</td>
+		</tr>		
+		<tr>
+			<td>
+				<input type="button" value="Call" ID="call" self="I18N_USERAPPDEMO_CALL"/>
+				<input type="button" value="Cancel Queuing" ID="cancelQueue" self="I18N_USERAPPDEMO_CANCEL_QUEUE"/>
+				<span self="I18N_USERAPPDEMO_RELEASE_WHICH">Which Call To Release:</span>
+				<select id="releaseCallidChoose" style="width:170px">
+				</select>
+				<input type="button" value="Release" ID="release" self="I18N_USERAPPDEMO_RELEASE"/>
+			</td>
+		</tr>		
+	</table>
+	<h3 self="I18N_USERAPPDEMO_WEBCHAT_RELATED">WebChat-related:</h3>
+	<table>
+		<tr>			
+			<td>
+				<textarea rows="20" id="ChatTextBox" readonly="readonly"
+				         style="width:530px;height:250px;overflow: auto;"></textarea><br/><br/>
+				<span self="I18N_USERAPPDEMO_MESSAGE">Message:</span><input id="ChatMessage" type="text" value="" style="width:320px"/>&nbsp;
+				<button id="textChatSend" name="ChatContentSend" self="I18N_USERAPPDEMO_SEND_MESSAGE">SendMessage</button>&nbsp;
+				<button id="textChatClear" name="ClearChatContent" self="I18N_USERAPPDEMO_CLEAR_CHAT_HISTORY">ClearChatHistory</button><br/><br/>
+				<div style=border-style:dashed;border-width:1px>
+				    <h3 self="I18N_USERAPPDEMO_ICP20">ICP2.0 Speciality</h3>
+					<input id="upfile" type="file"/>
+				    <button id="fileUpload" name="ChatContentSend" self="I18N_USERAPPDEMO_UPLOAD_FILE">Upload File</button><br/><br/>
+				    <span self="I18N_USERAPPDEMO_FILE_PATH">File Path:</span><input id="filePath" type="text" value="" style="width:420px"/>&nbsp;
+				    <button id="fileDownload" name="ChatContentSend" self="I18N_USERAPPDEMO_DOWNLOAD_FILE">Download File</button><br/><br/>
+				</div>
+			</td>
+		</tr>
+	</table>
+	<h3 self="I18N_USERAPPDEMO_MULTIMEDIA_RELATED">Multimedia Related</h3>
+	
+	<table>
+	   <tr>
+           <td>
+               <div id="memberList"><span self="I18N_USERAPPDEMO_CONFERENCE_MEMBER">Conference Participant: </span></div>
+           </td>
+       </tr>
+		<tr>
+			<td>
+				<input type="button" value="Create Conference" ID="requestMeeting" self="I18N_USERAPPDEMO_CREATE_MEETING"/>
+				<input type="button" value="End Conference" ID="stopMeeting" self="I18N_USERAPPDEMO_RELEASE_MEETING"/>
+			</td>
+		</tr>
+		<tr>
+			<td>
+			    <select id="screenShareType">
+                    <option value="Desktop">Share Desktop</option>
+                    <option value="Application">Share Application</option>
+                </select>
+				<input type="button" value="Start DesktopShare" ID="startShareScreen" self="I18N_USERAPPDEMO_START_DESKTOP_SHARE"/>
+				<input type="button" value="Stop DesktopShare" ID="stopShareScreen" self="I18N_USERAPPDEMO_STOP_DESKTOP_SHARE"/>
+				<input type="button" value="Ask RemoteCtrl" ID="requestControl" self="I18N_USERAPPDEMO_ASK_REMOTE_CTRL"/>		
+                <input type="button" value="Authorize RemoteCtrl" ID="addOperationPrivilege" self="I18N_USERAPPDEMO_ALLOW_REMOTE_CTRL"/>			
+                <input type="button" value="Revoke RemoteCtrl" ID="deleteOperationPrivilege" self="I18N_USERAPPDEMO_STOP_REMOTE_CTRL"/>	
+                <input type="button" value="Refuse RemoteCtrl" ID="refuseControl" self="I18N_USERAPPDEMO_REFUSE_REMOTE_CTRL"/>
+			</td>
+		</tr>
+		<tr>
+            <td>
+        	    <span self="I18N_USERAPPDEMO_DOCUMENT_SHARE_PATH"> Absolute Document Path For Sharing: </span><input type="text" value="C:/Users//Desktop/test2.docx" style="width:425px" ID="shareFilePath"/>			
+            </td>
+         </tr>
+         <tr>
+            <td>
+                <input type="button" value="Start Document Sharing" ID ="startShareFile" self="I18N_USERAPPDEMO_DOCUMENT_SHARE_START"/>	
+                <input type="button" value="Save Document" ID ="storeShareFile" self="I18N_USERAPPDEMO_DOCUMENT_SHARE_SAVE"/>	
+                <input type="button" value="Stop Document Sharing" ID ="stopShareFile" self="I18N_USERAPPDEMO_DOCUMENT_SHARE_STOP"/>			
+                <input type="button" value="Last Page" ID ="previousPage" self="I18N_USERAPPDEMO_DOCUMENT_LAST_PAGE"/>	
+                <input type="button" value="Next Page" ID ="nextPage" self="I18N_USERAPPDEMO_DOCUMENT_NEXT_PAGE"/>		
+                <span id="currentPage"></span>
+                <span id="totalPage"></span>
+            </td>
+         </tr>
+         <tr id="pages">
+         </tr>
+	</table>
+	<div id="application"></div>
+</div>
+<div style="float:left;width:33%">
+	<p self="I18N_USERAPPDEMO_LOG">LOG</p>
+	<p>
+		<input type="button" value="Clear Log" ID="clearLog" self="I18N_USERAPPDEMO_LOG_CLEAR"/>
+	</p>
+
+	<textarea id="LogInfo" readonly="readonly" rows="50" style="width:100%"></textarea>
+</div>
+
+</body>
+</html>

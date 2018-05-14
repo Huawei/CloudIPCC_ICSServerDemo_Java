@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration scan="true" scanPeriod="30 seconds">
+	<property name="log.dir" value="${catalina.base}/logs/userdemo" />
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">  
+        <file>${log.dir}/userdemo.log</file>  
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">  
+             <fileNamePattern>${log.dir}/userdemo.%d{yyyy-MM-dd}.%i.log.zip</fileNamePattern>  
+             <maxHistory>10</maxHistory>         
+        <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+             <maxFileSize>50MB</maxFileSize>
+        </timeBasedFileNamingAndTriggeringPolicy>  
+        </rollingPolicy> 
+        <encoder>  
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%-20method] [%msg] [%thread] [%file:%line]%n</pattern>  
+        </encoder>  
+    </appender>
+    
+    <logger name="com.huawei.userdemo.servlet.InitServletListener" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.userdemo.servlet.ParamterConfServlet" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.userdemo.servlet.QuasiRealTimeCallServlet" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.userdemo.servlet.QueryQueueDeviceServlet" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.userdemo.servlet.ServerConnectServlet" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.userdemo.servlet.UserOnlineServlet" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.userdemo.servlet.VerifiyCodeServlet" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.userdemo.servlet.EventHandleServlet" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <!-- 
+    
+    <logger name="com.huawei.userdemo.servlet.CallServlet" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.userdemo.servlet.OnlineweccServlet" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+     -->
+    
+    <logger name="com.huawei.userdemo.service.GetEventThread" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.userdemo.service.ParamterConfService" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.userdemo.service.QuasiRealTimeCallService" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.userdemo.service.QueryQueueDeviceService" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.userdemo.service.ServerConnectService" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.userdemo.service.UserOnlineService" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.userdemo.service.VerifiyCodeService" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.userdemo.service.HeartBeatThread" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.userdemo.service.ServiceUtil" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    <!-- 
+    
+    <logger name="com.huawei.userdemo.service.UserService" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+     -->  
+    
+    <logger name="com.huawei.demo.config.ConfigProperties" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.demo.filter.RequestFilter" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.demo.request.Request" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <logger name="com.huawei.demo.util.FileUtil" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE" />
+    </logger>
+    
+</configuration>
+
+
+
+
+
+
+
